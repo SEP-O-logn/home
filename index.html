@@ -1,106 +1,348 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O(logn)</title>
-    <style>
-      @font-face {
-        font-family: "Noto Sans Local";
-        src: url("assets/fonts/NotoSans-VariableFont_wdth,wght.ttf") format("truetype");
-        font-weight: 100 900;
-        font-style: normal;
-        font-display: swap;
-      }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caruso Dataplace — Vehicle Data Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --blue: #1DA1F2;
+  --blue-dim: rgba(29,161,242,0.12);
+  --blue-border: rgba(29,161,242,0.22);
+  --navy: #0A2139;
+  --navy2: #0d2d4f;
+  --light: #F2F7FC;
+  --white: #ffffff;
+  --td: #0A2139;
+  --tm: #3a5a7a;
+  --tmut: #7a9ab8;
+  --border: rgba(29,161,242,0.15);
+}
+body { font-family: 'Roboto', sans-serif; background: var(--white); color: var(--td); overflow-x: hidden; }
 
-      :root {
-        --bg-top: #f8fafc;
-        --bg-bottom: #edf4ff;
-        --text: #0f172a;
-        --muted: #334155;
-        --accent: #0ea5e9;
-      }
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+  padding: 0 6%; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 16px rgba(10,33,57,0.06);
+}
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-size: 13px; color: var(--blue); text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
+.nav-links a:hover { opacity: 0.65; }
 
-      * {
-        box-sizing: border-box;
-      }
+/* HERO */
+.hero {
+  background: var(--navy);
+  background-image: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(29,161,242,0.10) 0%, transparent 70%);
+  padding: 100px 6% 88px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end;
+}
+@media(max-width:720px){ .hero { grid-template-columns: 1fr; padding: 60px 6%; } }
+.hero h1 { font-family: 'Raleway', sans-serif; font-size: clamp(32px, 4.2vw, 56px); font-weight: 900; line-height: 1.06; color: #fff; letter-spacing: -1.5px; margin-bottom: 22px; }
+.hero h1 em { color: var(--blue); font-style: normal; }
+.hero-sub { font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.75; margin-bottom: 36px; max-width: 440px; font-weight: 300; }
+.hero-sub strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+.btn-primary { background: var(--blue); color: #fff; border: none; border-radius: 8px; padding: 13px 26px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Roboto', sans-serif; transition: opacity 0.2s, transform 0.2s; }
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 24px;
-        background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-        color: var(--text);
-        font-family: "Noto Sans Local";
-        font-style: normal;
-      }
+/* MOCK FRAME */
+.mock-frame { border-radius: 14px; overflow: hidden; border: 1px solid rgba(29,161,242,0.2); background: rgba(255,255,255,0.03); transition: transform 0.35s ease, box-shadow 0.35s ease; }
+.mock-frame:hover { transform: scale(1.1); box-shadow: 0 20px 60px rgba(29,161,242,0.18); }
+.mock-frame.light { border-color: var(--border); background: rgba(29,161,242,0.03); }
+.mock-bar { padding: 9px 14px; display: flex; gap: 5px; align-items: center; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.mock-frame.light .mock-bar { background: rgba(29,161,242,0.05); border-color: var(--border); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mock-frame img { width: 100%; height: auto; display: block; }
 
-      main {
-        text-align: center;
-        max-width: 940px;
-      }
+/* STRIP */
+.strip { background: var(--navy2); border-top: 1px solid rgba(29,161,242,0.1); border-bottom: 1px solid rgba(29,161,242,0.1); padding: 26px 6%; display: flex; align-items: center; justify-content: center; gap: 52px; flex-wrap: wrap; }
+.strip-item { text-align: center; }
+.strip-n { font-family: 'Raleway', sans-serif; font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
+.strip-l { font-size: 11px; color: rgba(255,255,255,0.42); margin-top: 2px; display: block; letter-spacing: 0.5px; text-transform: uppercase; }
+.strip-sep { color: rgba(29,161,242,0.2); font-size: 24px; }
 
-      .site-logo {
-        display: block;
-        width: min(260px, 60vw);
-        height: auto;
-        margin: 0 auto 1.6rem;
-      }
+/* SECTIONS */
+.sec { padding: 88px 6%; }
+.sec-light { background: var(--light); }
+.sec-dark { background: var(--navy); }
+.slabel { font-size: 10px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; display: block; }
+.stitle { font-family: 'Raleway', sans-serif; font-size: clamp(24px, 3.2vw, 38px); font-weight: 900; line-height: 1.1; color: var(--td); letter-spacing: -0.6px; margin-bottom: 14px; }
+.sec-dark .stitle { color: #fff; }
+.ssub { font-size: 15px; color: var(--tm); line-height: 1.75; max-width: 540px; font-weight: 300; }
+.sec-dark .ssub { color: rgba(255,255,255,0.44); }
+.center { text-align: center; }
+.center .ssub { margin: 0 auto; }
 
-      h1 {
-        margin: 0;
-        font-family: "Noto Sans Local";
-        font-size: clamp(2.4rem, 8vw, 5.4rem);
-        line-height: 1.05;
-        letter-spacing: -0.02em;
-        font-weight: 600;
-        font-style: normal;
-      }
+/* FEATURE CARDS */
+/* FEATURE CARDS */
+.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 52px; }
+@media(max-width:640px){ .feat-grid { grid-template-columns: 1fr; } }
+.fcard { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 30px 26px 100px; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; position: relative; overflow: hidden; display: block; color: inherit; text-decoration: none; }
+.fcard-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue), rgba(29,161,242,0.3)); opacity: 0; transition: opacity 0.25s; }
+.fcard-bg-num { position: absolute; bottom: 0; right: 0; font-family: 'Raleway', sans-serif; font-size: 100px; font-weight: 900; color: var(--blue); opacity: 0.10; line-height: 1; pointer-events: none; user-select: none; letter-spacing: -4px; }
+.fcard:hover { border-color: rgba(29,161,242,0.35); transform: translateY(-5px); box-shadow: 0 16px 48px rgba(29,161,242,0.1); }
+.fcard:hover .fcard-accent { opacity: 1; }
+.fcard:hover .fcard-bg-num { opacity: 0.18; }
+.fcard h4 { font-family: 'Raleway', sans-serif; font-size: 17px; font-weight: 800; color: var(--td); margin-bottom: 12px; letter-spacing: -0.2px; }
+.fcard p { font-size: 13px; color: var(--tm); line-height: 1.65; margin-bottom: 18px; font-weight: 300; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { display: inline-block; background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); border-radius: 20px; font-size: 11px; font-weight: 400; padding: 3px 10px; }
 
-      p {
-        margin: 1rem 0 0;
-        font-size: clamp(0.98rem, 2.2vw, 1.22rem);
-        line-height: 1.5;
-        color: var(--muted);
-        font-family: "Noto Sans Local";
-        font-weight: 400;
-        font-style: normal;
-      }
+/* SHOWCASE */
+.showcase { padding: 88px 6%; }
+.showcase-dark { background: var(--navy); }
+.showcase-light { background: var(--light); }
+.showcase-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1140px; margin: 0 auto; }
+.showcase-flip .showcase-inner { direction: rtl; }
+.showcase-flip .showcase-inner > * { direction: ltr; }
+@media(max-width:700px){ .showcase-inner { grid-template-columns: 1fr; direction: ltr !important; } }
+.sc-text h3 { font-family: 'Raleway', sans-serif; font-size: clamp(20px, 2.5vw, 28px); font-weight: 900; line-height: 1.18; color: var(--td); margin-bottom: 16px; letter-spacing: -0.5px; }
+.showcase-dark .sc-text h3 { color: #fff; }
+.sc-text p { font-size: 14px; color: var(--tm); line-height: 1.75; margin-bottom: 22px; font-weight: 300; }
+.showcase-dark .sc-text p { color: rgba(255,255,255,0.48); }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue-border); border-radius: 20px; font-size: 12px; font-weight: 300; padding: 4px 12px; }
 
-      a {
-        color: var(--accent);
-        text-decoration-thickness: 2px;
-        text-underline-offset: 3px;
-        font-family: "Noto Sans Local";
-        font-weight: 400;
-        font-style: normal;
-      }
+/* HOW IT WORKS */
+.steps-wrap { padding: 88px 6%; background: var(--navy); text-align: center; }
+.steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; position: relative; }
+.steps-row::before { content: ''; position: absolute; top: 36px; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(29,161,242,0.3), transparent); }
+.step { padding: 0 12px; }
+.snum { width: 72px; height: 72px; border-radius: 50%; background: var(--navy2); border: 2px solid var(--blue); color: var(--blue); font-family: 'Raleway', sans-serif; font-size: 26px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; position: relative; z-index: 1; }
+.step h4 { font-family: 'Raleway', sans-serif; font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.step p { font-size: 13px; color: rgba(255,255,255,0.38); line-height: 1.7; font-weight: 300; }
 
-      .separator {
-        color: #64748b;
-        margin: 0 0.4rem;
-      }
+/* TEAM */
+.team-sec { padding: 80px 6% 72px; background: var(--light); text-align: center; }
+.team-sub { font-size: 15px; color: var(--tm); max-width: 480px; margin: 0 auto 40px; line-height: 1.7; font-weight: 300; }
+.team-photo { max-width: 760px; margin: 0 auto 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 8px 40px rgba(10,33,57,0.08); }
+.team-photo img { width: 100%; height: auto; display: block; }
+.team-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.tcard { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 18px 14px; width: 108px; transition: border-color 0.2s, transform 0.2s; }
+.tcard:hover { border-color: rgba(29,161,242,0.35); transform: translateY(-2px); }
+.av { width: 40px; height: 40px; border-radius: 50%; background: var(--blue-dim); border: 1.5px solid var(--blue-border); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 800; color: var(--blue); }
+.tcard .tn { font-size: 13px; font-weight: 500; color: var(--td); }
+.tcard .tr { font-size: 11px; color: var(--tmut); margin-top: 3px; }
+.cbadge { display: inline-flex; align-items: center; gap: 8px; background: var(--white); border: 1px solid var(--border); border-radius: 40px; padding: 9px 20px; margin-top: 32px; font-size: 13px; color: var(--tm); }
+.cbadge strong { color: var(--td); }
+.team-names { display: flex; justify-content: space-between; margin-top: 6px; }
+.team-name { text-align: center; flex: 1; }
+.team-name .tn { font-size: 13px; font-weight: 500; color: var(--td); display: block; }
+.team-name .tr { font-size: 11px; color: var(--tmut); margin-top: 2px; display: block; }
+.team-names { 
+  display: flex; justify-content: space-between; 
+}
+.team-name .tn { 
+  font-size: 12px; font-weight: 500; 
+  color: var(--td); display: block; 
+}
 
-      a:hover,
-      a:focus-visible {
-        color: #0284c7;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      
-      <img class="site-logo" src="assets/SEP_Logo_Final.png" alt="SEP Logo">
+footer { background: var(--navy); padding: 30px 6%; text-align: center; font-size: 12px; color: rgba(255,255,255,0.25); border-top: 1px solid rgba(29,161,242,0.08); letter-spacing: 0.3px; }
+footer span { color: var(--blue); }
+</style>
+</head>
+<body>
 
-      <h1>Willkommen auf der Website von O(logn) 👋</h1>
-      <p>
-        Diese Seite befindet sich noch im Aufbau. <br>
-        <a href="https://moodle.hs-mannheim.de/mod/wiki/view.php?pageid=3283" target="_blank" rel="noopener noreferrer">Hier geht's zu unserer Moodle-Seite.</a>
-        <span class="separator" aria-hidden="true">|</span>
-        <a href="https://www.hs-mannheim.de/impressum.html">Impressum</a>.
-      </p>
-    </main>
-  </body>
+<nav>
+  <img src="assets/caruso_logo.png" style="height:30px;width:auto" alt="Caruso Dataplace">
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">So funktioniert's</a>
+    <a href="#team">Team</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Der Datenkatalog,<br><em>neu gedacht.</em></h1>
+    <p class="hero-sub">
+      Caruso verbindet Fahrzeugdatenanbieter und -nutzer auf einer Plattform.
+      Wir haben den Katalog von Grund auf überarbeitet.
+      <strong>Mit KI-Suche, interaktivem Graph View und Echtzeit-Kollaboration.</strong>
+    </p>
+    <button class="btn-primary">Plattform entdecken</button>
+  </div>
+  <div class="mock-frame">
+    <div class="mock-bar">
+      <div class="dot" style="background:#ff5f57"></div>
+      <div class="dot" style="background:#febc2e"></div>
+      <div class="dot" style="background:#28c840"></div>
+    </div>
+    <img src="assets/HeroBanner.png" alt="Caruso Dataplace">
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-item"><span class="strip-n">400+</span><span class="strip-l">Datenpunkte</span></div>
+  <div class="strip-sep">·</div>
+  <div class="strip-item"><span class="strip-n">3</span><span class="strip-l">Einstiegswege</span></div>
+  <div class="strip-sep">·</div>
+  <div class="strip-item"><span class="strip-n">1</span><span class="strip-l">Plattform</span></div>
+</div>
+
+<section class="sec center" id="features">
+  <span class="slabel">Was wir gebaut haben</span>
+  <h2 class="stitle">Drei Features. Vollständig neu.</h2>
+  <p class="ssub">Nicht ein weiteres Datenportal. Eine Plattform, die Nutzern wirklich hilft, die richtigen Daten zu finden, zu verstehen und zu bestellen.</p>
+  <div class="feat-grid">
+    <a href="#showcase-graph" class="fcard">
+      <div class="fcard-accent"></div>
+      <div class="fcard-bg-num">01</div>
+      <h4>Graph View</h4>
+      <p>Kein Scrollen durch endlose Listen. Der Katalog öffnet sich als interaktives Netzwerk, verwandte Datenpunkte landen automatisch nah beieinander. Zusammenhänge werden sichtbar, bevor man danach sucht.</p>
+      <div class="badges">
+        <span class="badge">Explorativ</span>
+        <span class="badge">Visuell</span>
+        <span class="badge">Physik-Simulation</span>
+      </div>
+    </a>
+    <a href="#showcase-ki" class="fcard">
+      <div class="fcard-accent"></div>
+      <div class="fcard-bg-num">02</div>
+      <h4>KI-gestützte Suche</h4>
+      <p>Einfach beschreiben, was man braucht. Die KI liefert exakte Treffer mit Begründung und assoziierte Ergebnisse die man sonst übersehen hätte. Im Warenkorb denkt sie weiter und schlägt passende Ergänzungen vor.</p>
+      <div class="badges">
+        <span class="badge">Intelligent</span>
+        <span class="badge">Kontextbewusst</span>
+        <span class="badge">Upselling</span>
+      </div>
+    </a>
+    <a href="#showcase-collab" class="fcard">
+      <div class="fcard-accent"></div>
+      <div class="fcard-bg-num">03</div>
+      <h4>Collaboration Session</h4>
+      <p>Datenpunkte gemeinsam erkunden, favorisieren und direkt in den Warenkorb legen. Alle Teilnehmer sehen denselben Zustand in Echtzeit. Ideal wenn nicht alle im Team die Datenwelt kennen.</p>
+      <div class="badges">
+        <span class="badge">Echtzeit</span>
+        <span class="badge">Multi-User</span>
+        <span class="badge">Geteilte Session</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<div class="showcase showcase-light" id="showcase-graph">
+  <div class="showcase-inner">
+    <div class="sc-text">
+      <span class="slabel">Graph View</span>
+      <h3>Daten sehen, nicht nur suchen.</h3>
+      <p>Der Graph View verwandelt den Katalog in eine lebendige Karte. Jeder Datenpunkt ist ein Knoten, gewichtete Kanten zeigen Verwandtschaften, eine Physik-Simulation zieht zusammengehörige Daten automatisch nah beieinander. Kategorien clustern sich von selbst, kein Setup, kein Konfigurieren, einfach öffnen und erkunden.</p>
+      <div class="tags">
+        <span class="tag">Cytoscape.js</span>
+        <span class="tag">Neo4j</span>
+        <span class="tag">Multi-Select</span>
+      </div>
+    </div>
+    <div class="mock-frame light">
+      <div class="mock-bar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+      </div>
+      <img src="assets/Graph.png" alt="Graph View">
+    </div>
+  </div>
+</div>
+
+<div class="showcase showcase-dark showcase-flip" id="showcase-ki">
+  <div class="showcase-inner">
+    <div class="sc-text">
+      <span class="slabel">KI-gestützte Suche</span>
+      <h3>Fragen statt filtern.</h3>
+      <p>Kein Dropdown, keine Filter, einfach tippen was man braucht. Llama 3.1 8b läuft lokal und matcht semantisch per RAG über alle Datenpunkte. Ergebnisse kommen mit Begründung, derselbe KI-Layer denkt im Warenkorb weiter und schlägt passende Ergänzungen vor.</p>
+      <div class="tags">
+        <span class="tag">Local LLM</span>
+        <span class="tag">Semantic Search</span>
+        <span class="tag">RAG</span>
+      </div>
+    </div>
+    <div class="mock-frame">
+      <div class="mock-bar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+      </div>
+      <img src="assets/KISuche.png" alt="KI-Suche">
+    </div>
+  </div>
+</div>
+
+<div class="showcase showcase-light" id="showcase-collab">
+  <div class="showcase-inner">
+    <div class="sc-text">
+      <span class="slabel">Collaboration Session</span>
+      <h3>Datenentscheidungen im Team treffen.</h3>
+      <p>Session starten, Link teilen, gemeinsam im Graph View erkunden. Alle Teilnehmer sehen denselben Zustand in Echtzeit, synchronisiert über WebSocket. Datenpunkte favorisieren, in den Warenkorb legen und gemeinsam bestellen, alles ohne die Session zu verlassen.</p>
+      <div class="tags">
+        <span class="tag">WebSocket</span>
+        <span class="tag">Live-Cursor</span>
+        <span class="tag">Echtzeit-Sync</span>
+      </div>
+    </div>
+    <div class="mock-frame light">
+      <div class="mock-bar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+      </div>
+      <img src="assets/Collab.png" alt="Collaboration Session">
+    </div>
+  </div>
+</div>
+
+<section class="steps-wrap" id="how">
+  <span class="slabel" style="color:rgba(29,161,242,0.7)">So funktioniert's</span>
+  <h2 class="stitle">Von der Suche zur Bestellung.</h2>
+  <div class="steps-row">
+    <div class="step">
+      <div class="snum">1</div>
+      <h4>Einstieg wählen</h4>
+      <p>Graph View, KI-Suche oder klassisches Browsen. Drei Wege in den Katalog, jeder führt zu denselben 400+ Datenpunkten.</p>
+    </div>
+    <div class="step">
+      <div class="snum">2</div>
+      <h4>Konfigurieren & auswählen</h4>
+      <p>Contract Type wählen, nach Marke und Domain filtern, Datenpunkte in den Warenkorb legen. Alleine oder gemeinsam in einer Collaboration Session.</p>
+    </div>
+    <div class="step">
+      <div class="snum">3</div>
+      <h4>Bestellen</h4>
+      <p>Warenkorb prüfen, KI-Empfehlungen ansehen, Bestellung in einem Schritt abschließen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="team-sec" id="team">
+  <span class="slabel">Das Team</span>
+  <img src="assets/logo_ologn.svg" style="height:240px;width:auto;display:block;margin:-30px auto 0" alt="Team O(log n)">
+  <p class="team-sub">Fünf Softwareentwickler und zwei Designer der TH Mannheim, als Semesterprojekt für Caruso GmbH.</p>
+  <div style="max-width:760px;margin:0 auto;">
+    <div class="team-photo">
+      <img src="assets/team.jpg" alt="Team O(log n)">
+    </div>
+    <div class="team-names">
+      <div class="team-name designer"><span class="tn">Bela</span></div>
+      <div class="team-name designer"><span class="tn">Finn</span></div>
+      <div class="team-name"><span class="tn">Marius</span></div>
+      <div class="team-name"><span class="tn">Lennart</span></div>
+      <div class="team-name"><span class="tn">Paul</span></div>
+      <div class="team-name"><span class="tn">Ben</span></div>
+      <div class="team-name"><span class="tn">Felix</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--tmut);margin-top:4px;text-align:start">&uarr; von links nach rechts</p>
+  </div>
+  <div class="cbadge">Semesterprojekt für <strong>Caruso GmbH</strong> &nbsp;·&nbsp; TH Mannheim 2026</div>
+</section>
+
+<footer>
+  <span>Caruso Dataplace</span> &nbsp;·&nbsp; Team O(log n) &nbsp;·&nbsp; TH Mannheim
+</footer>
+
+</body>
 </html>
