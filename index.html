@@ -184,9 +184,8 @@ footer span { color: var(--blue); }
   <div class="hero-text">
     <h1>Der Datenkatalog,<br><em>neu gedacht.</em></h1>
     <p class="hero-sub">
-      Caruso harmonisiert Fahrzeugdaten auf einer Plattform.
-      Wir haben den Katalog von Grund auf überarbeitet.
-      <strong>Mit KI-Suche, interaktivem Graph View und Echtzeit-Kollaboration.</strong>
+     Caruso GmbH macht Mobilitätsdaten zugänglich und nutzbar. Wir haben den Katalog dahinter neu gedacht.
+     <strong>Mit KI-Suche, interaktivem Graph View und Echtzeit-Kollaboration.</strong>
     </p>
   </div>
 
@@ -248,20 +247,20 @@ footer span { color: var(--blue); }
   <div class="showcase-inner">
     <div class="sc-text">
       <span class="slabel">Graph View</span>
-<h3>Daten <em style="color:var(--blue);font-style:normal;">sehen,</em> nicht nur suchen.</h3>
+      <h3>Daten <em style="color:var(--blue);font-style:normal;">sehen,</em> nicht nur suchen.</h3>
       <p>Der Graph View verwandelt den Katalog in ein interaktives Netzwerk. Jeder Datenpunkt ist ein Knoten, gewichtete Kanten zeigen Verwandtschaften, eine Physik-Simulation macht den Graph lebendig und lädt zum Erkunden, Ziehen und Entdecken ein.</p>
       <div class="tags">
-         <span class="tag">Explorativ</span>
+        <span class="tag">Explorativ</span>
         <span class="tag">Cytoscape.js</span>
         <span class="tag">Neo4j</span>
       </div>
     </div>
-    
-    <div class="mock-frame light">
-  <video src="assets/GRAPH.mp4" muted loop playsinline autoplay
-    data-modal-video>
-  </video>
-</div>
+    <div>
+      <div class="mock-frame light">
+        <video src="assets/GRAPH.mp4" muted loop playsinline data-modal-video></video>
+      </div>
+      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
+    </div>
   </div>
 </div>
 
@@ -277,10 +276,11 @@ footer span { color: var(--blue); }
         <span class="tag">RAG</span>
       </div>
     </div>
-    <div class="mock-frame">
-      <video src="assets/KI.mp4" muted loop playsinline autoplay
-        data-modal-video>
-      </video>
+    <div>
+      <div class="mock-frame">
+        <video src="assets/KI.mp4" muted loop playsinline data-modal-video></video>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
     </div>
   </div>
 </div>
@@ -297,10 +297,11 @@ footer span { color: var(--blue); }
         <span class="tag">WebSocket</span>
       </div>
     </div>
-    <div class="mock-frame light">
-      <video src="assets/COLLAB.mp4" muted loop playsinline autoplay
-        data-modal-video>
-      </video>
+    <div>
+      <div class="mock-frame light">
+        <video src="assets/COLLAB.mp4" muted loop playsinline data-modal-video></video>
+      </div>
+      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
     </div>
   </div>
 </div>
@@ -362,13 +363,15 @@ footer span { color: var(--blue); }
   const modalVideo = document.getElementById('vidModalVideo');
   const closeBtn = document.getElementById('vidModalClose');
 
-  document.querySelectorAll('[data-modal-video]').forEach(v => {
+ document.querySelectorAll('[data-modal-video]').forEach(v => {
+    v.addEventListener('mouseenter', () => v.play());
+    v.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
     v.addEventListener('click', () => {
-      modalVideo.src = v.src;
-      modal.classList.add('open');
-      modalVideo.play();
+        modalVideo.src = v.src;
+        modal.classList.add('open');
+        modalVideo.play();
     });
-  });
+});
 
   function closeModal() {
     modal.classList.remove('open');
