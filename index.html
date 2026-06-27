@@ -27,13 +27,13 @@ body { font-family: 'Roboto', sans-serif; background: var(--white); color: var(-
 nav {
   position: sticky; top: 0; z-index: 100;
   background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
-  padding: 0 6%; height: 60px;
+  padding: 0 6%; height: 80px;
   display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 16px rgba(10,33,57,0.06);
 }
 .nav-links { display: flex; gap: 28px; align-items: center; }
-.nav-links a { font-size: 13px; color: var(--blue); text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
+.nav-links a { font-size: 16px; color: var(--blue); text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
 .nav-links a:hover { opacity: 0.65; }
 
 /* HERO */
@@ -61,10 +61,10 @@ nav {
 .mock-frame img { width: 100%; height: auto; display: block; }
 
 /* STRIP */
-.strip { background: var(--navy2); border-top: 1px solid rgba(29,161,242,0.1); border-bottom: 1px solid rgba(29,161,242,0.1); padding: 26px 6%; min-height: 40vh; display: flex; align-items: flex-start; justify-content: center; gap: 52px; flex-wrap: wrap; }
+.strip { background: var(--navy2); border-top: 1px solid rgba(29,161,242,0.1); border-bottom: 1px solid rgba(29,161,242,0.1); padding: 26px 6%; min-height: 40vh; display: flex; align-items: center; justify-content: center; gap: 52px; flex-wrap: wrap; }
 .strip-item { text-align: center; }
-.strip-n { font-family: 'Raleway', sans-serif; font-size: 22px; font-weight: 900; color: var(--blue); display: block; }
-.strip-l { font-size: 11px; color: rgba(255,255,255,0.42); margin-top: 2px; display: block; letter-spacing: 0.5px; text-transform: uppercase; }
+.strip-n { font-family: 'Raleway', sans-serif; font-size: 48px; font-weight: 900; color: var(--blue); display: block; }
+.strip-l { font-size: 12px; color: rgba(255,255,255,0.42); margin-top: 2px; display: block; letter-spacing: 0.5px; text-transform: uppercase; }
 .strip-sep { color: rgba(29,161,242,0.2); font-size: 24px; }
 
 /* SECTIONS */
@@ -172,7 +172,7 @@ footer span { color: var(--blue); }
 <body>
 
 <nav>
-  <img src="assets/caruso_logo.png" style="height:30px;width:auto" alt="Caruso Dataplace">
+  <img src="assets/caruso_logo.png" style="height:40px;width:auto" alt="Caruso Dataplace">
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#how">Warum unser Katalog?</a>
@@ -189,8 +189,9 @@ footer span { color: var(--blue); }
       <strong>Mit KI-Suche, interaktivem Graph View und Echtzeit-Kollaboration.</strong>
     </p>
   </div>
-  <div class="mock-frame" style="width: 100%; transform-origin: left top;">
-  <img src="assets/HeroBanner.png" alt="Caruso Dataplace">
+
+  <div style="position:relative; width:100%; align-self:stretch; min-height:400px;">
+  <canvas id="heroCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.7;"></canvas>
 </div>
 </section>
 
@@ -297,7 +298,7 @@ footer span { color: var(--blue); }
       </div>
     </div>
     <div class="mock-frame light">
-      <video src="assets/collab-demo.mp4" muted loop playsinline autoplay
+      <video src="assets/COLLAB.mp4" muted loop playsinline autoplay
         data-modal-video>
       </video>
     </div>
@@ -331,7 +332,7 @@ footer span { color: var(--blue); }
 
 <section class="team-sec" id="team">
   <span class="slabel" style="text-align:center;display:block;">Das Team</span>
-  <img src="assets/logo_ologn.svg" style="height:80px;width:auto;display:block;margin:32px auto 24px;" alt="Team O(log n)">
+  <img src="assets/logo_ologn.svg" style="height:140px;width:auto;display:block;margin:32px auto 24px;" alt="Team O(log n)">
   <p class="team-sub">Fünf Softwareentwickler und zwei Designer der TH Mannheim, als Semesterprojekt für Caruso GmbH.</p>
 
   <div style="max-width:900px;margin:0 auto 32px;">
@@ -400,6 +401,73 @@ wrap.addEventListener('touchstart', e => { dragging = true; setPos(e.touches[0].
 window.addEventListener('touchmove', e => { if (dragging) setPos(e.touches[0].clientX); });
 window.addEventListener('touchend', () => dragging = false);
 
+// HERO NETWORK ANIMATION
+const canvas = document.getElementById('heroCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = canvas.parentElement.offsetWidth * window.devicePixelRatio;
+  canvas.height = canvas.parentElement.offsetHeight * window.devicePixelRatio;
+  canvas.style.width = canvas.parentElement.offsetWidth + 'px';
+  canvas.style.height = canvas.parentElement.offsetHeight + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  nodes.forEach(n => {
+    n.x = Math.random() * canvas.parentElement.offsetWidth;
+    n.y = Math.random() * canvas.parentElement.offsetHeight;
+  });
+}
+
+const nodes = Array.from({length: 40}, () => ({
+  x: 0, y: 0,
+  vx: (Math.random() - 0.5) * 0.4,
+  vy: (Math.random() - 0.5) * 0.4,
+  r: Math.random() * 6 + 5
+}));
+
+window.addEventListener('load', resize);
+window.addEventListener('resize', resize);
+
+function draw() {
+ const W = canvas.parentElement.offsetWidth;
+const H = canvas.parentElement.offsetHeight;
+ctx.clearRect(0, 0, W, H);
+  
+  // Kanten
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 200) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+       ctx.strokeStyle = `rgba(29,161,242,${0.4 * (1 - dist/160)})`;
+ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+  }
+  
+  // Knoten
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+ctx.fillStyle = 'rgba(29,161,242,1)';
+    ctx.fill();
+  });
+  
+  // Bewegung
+  nodes.forEach(n => {
+    n.x += n.vx;
+    n.y += n.vy;
+   if (n.x < n.r || n.x > W - n.r) n.vx *= -1;
+if (n.y < n.r || n.y > H - n.r) n.vy *= -1;
+  });
+  
+  requestAnimationFrame(draw);
+}
+draw();
 </script>
 </body>
 </html>
