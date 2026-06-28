@@ -507,8 +507,8 @@ const cy = cytoscape({
 const rootNode = cy.getElementById('root');
 rootNode.position({ x: cyContainer.clientWidth * 0.65, y: cyContainer.clientHeight / 2 });
 
-const w = cyContainer.clientWidth;
-const h = cyContainer.clientHeight;
+const w = cyContainer.offsetWidth || window.innerWidth;
+const h = cyContainer.offsetHeight || 500;
 const cx = w * 0.60;
 const cy2 = h * 0.55;
 
@@ -521,6 +521,9 @@ cy.getElementById('mileage').position({ x: cx + 310, y: cy2 + 130 });
 
 cy.nodes('[type = "datapoint"]').addClass('hidden');
 cy.edges('[target = "fuel_level"], [target = "engine_status"], [target = "mileage"]').addClass('hidden');
+
+// Initiale Ausrichtung
+cy.ready(() => { cy.reset(); });
 
 cy.on('mouseover', 'node', function(e) {
   e.target.addClass('hovered');
