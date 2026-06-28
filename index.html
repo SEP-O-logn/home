@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Caruso Dataplace — Vehicle Data Marketplace</title>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -40,10 +41,20 @@ nav {
 .hero {
   background: var(--navy);
   background-image: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(29,161,242,0.10) 0%, transparent 70%);
-  padding: 100px 6% 88px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  padding: 0;
+  display: block;
+  position: relative;
+  min-height: 500px;
 }
-@media(max-width:720px){ .hero { grid-template-columns: 1fr; padding: 60px 6%; } }
+.hero-text {
+  position: absolute;
+  left: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  max-width: 460px;
+  pointer-events: none;
+}
 .hero h1 { font-family: 'Raleway', sans-serif; font-size: clamp(32px, 4.2vw, 56px); font-weight: 900; line-height: 1.06; color: #fff; letter-spacing: -1.5px; margin-bottom: 22px; }
 .hero h1 em { color: var(--blue); font-style: normal; }
 .hero-sub { font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.75; margin-bottom: 36px; max-width: 440px; font-weight: 300; }
@@ -189,9 +200,10 @@ footer span { color: var(--blue); }
     </p>
   </div>
 
-  <div style="position:relative; width:100%; align-self:stretch; min-height:400px;">
-  <canvas id="heroCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.7;"></canvas>
-</div>
+ <div id="cy" style="width:100%; height:500px; background:transparent; overflow:hidden;"></div>
+ <p style="position:absolute; bottom:20px; right:6%; font-size:11px; color:rgba(255,255,255,0.3); letter-spacing:0.5px; pointer-events:none;">
+  ↑ Klicken · Ziehen · Erkunden
+</p>
 </section>
 
 <div class="strip">
@@ -212,7 +224,9 @@ footer span { color: var(--blue); }
       <img src="assets/alt.png" style="width:900px; max-width:none; display:block;">
     </div>
     <div id="slider-line" style="position:absolute; top:0; left:50%; width:3px; height:100%; background:var(--blue); transform:translateX(-50%);">
-      <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">⇔</div>
+     <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.3);">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5l-7 7 7 7M16 5l7 7-7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+</div>
     </div>
   </div>
 </div>
@@ -259,7 +273,7 @@ footer span { color: var(--blue); }
       <div class="mock-frame light">
         <video src="assets/GRAPH.mp4" muted loop playsinline data-modal-video></video>
       </div>
-      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
+      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Klicken für Vollbild</p>
     </div>
   </div>
 </div>
@@ -280,7 +294,7 @@ footer span { color: var(--blue); }
       <div class="mock-frame">
         <video src="assets/KI.mp4" muted loop playsinline data-modal-video></video>
       </div>
-      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;text-align:center;letter-spacing:0.3px;">Klicken für Vollbild</p>
     </div>
   </div>
 </div>
@@ -301,7 +315,7 @@ footer span { color: var(--blue); }
       <div class="mock-frame light">
         <video src="assets/COLLAB.mp4" muted loop playsinline data-modal-video></video>
       </div>
-      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Hover für Vorschau · Klicken für Vollbild</p>
+      <p style="font-size:11px;color:var(--tmut);margin-top:8px;text-align:center;letter-spacing:0.3px;">Klicken für Vollbild</p>
     </div>
   </div>
 </div>
@@ -363,9 +377,18 @@ footer span { color: var(--blue); }
   const modalVideo = document.getElementById('vidModalVideo');
   const closeBtn = document.getElementById('vidModalClose');
 
- document.querySelectorAll('[data-modal-video]').forEach(v => {
-    v.addEventListener('mouseenter', () => v.play());
-    v.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
+ const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.play();
+        } else {
+            entry.target.pause();
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-modal-video]').forEach(v => {
+    observer.observe(v);
     v.addEventListener('click', () => {
         modalVideo.src = v.src;
         modal.classList.add('open');
@@ -404,73 +427,189 @@ wrap.addEventListener('touchstart', e => { dragging = true; setPos(e.touches[0].
 window.addEventListener('touchmove', e => { if (dragging) setPos(e.touches[0].clientX); });
 window.addEventListener('touchend', () => dragging = false);
 
-// HERO NETWORK ANIMATION
-const canvas = document.getElementById('heroCanvas');
-const ctx = canvas.getContext('2d');
+const cyContainer = document.getElementById('cy');
 
-function resize() {
-  canvas.width = canvas.parentElement.offsetWidth * window.devicePixelRatio;
-  canvas.height = canvas.parentElement.offsetHeight * window.devicePixelRatio;
-  canvas.style.width = canvas.parentElement.offsetWidth + 'px';
-  canvas.style.height = canvas.parentElement.offsetHeight + 'px';
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  nodes.forEach(n => {
-    n.x = Math.random() * canvas.parentElement.offsetWidth;
-    n.y = Math.random() * canvas.parentElement.offsetHeight;
-  });
-}
+const cy = cytoscape({
+  container: cyContainer,
+  style: [
+    { selector: 'node', style: {
+      'background-color': '#177FBF',
+      'label': 'data(label)',
+      'color': '#fff',
+      'font-size': '10px',
+      'font-family': 'Roboto',
+      'text-valign': 'center',
+      'text-halign': 'center',
+      'text-wrap': 'wrap',
+      'text-max-width': '95px',
+      'width': '100px',
+      'height': '100px',
+      'shape': 'ellipse',
+      'cursor': 'pointer',
+    }},
+    { selector: 'node[type="root"]', style: {
+      'background-color': '#177FBF',
+      'width': '120px',
+      'height': '120px',
+      'font-size': '11px',
+      'text-max-width': '110px',
+    }},
+    { selector: 'node[type="category"]', style: {
+  'background-color': '#1DA1F2',
+  'border-width': 0,
+  'border-color': 'rgba(29,161,242,0)',
+}},
+    { selector: 'node[type="datapoint"]', style: {
+      'background-color': '#67BEF4',
+      'width': '85px',
+      'height': '85px',
+      'font-size': '9px',
+      'text-max-width': '80px',
+    }},
+    { selector: 'edge', style: {
+      'line-color': '#1a91da',
+      'width': 1.5,
+      'curve-style': 'straight',
+    }},
+   { selector: '.hidden', style: { 'display': 'none' }},
+{ selector: '.hovered', style: {
+  'border-width': 1.5,
+  'border-color': 'rgba(29,161,242,0.6)',
+  'border-opacity': 1,
+  'background-color': '#1d8fcc',
+}},
+  ],
+  elements: [
+    { data: { id: 'root', label: 'Vehicle Status & Basics', type: 'root' }},
+    
+    // Kategorie 1
+    { data: { id: 'engine', label: 'Engine & Fuel', type: 'category', parent_id: 'root' }},
+    { data: { id: 'fuel_level', label: 'Fuel Level', type: 'datapoint', parent_id: 'engine' }},
+    { data: { id: 'engine_status', label: 'Engine Status', type: 'datapoint', parent_id: 'engine' }},
+    
+    // Kategorie 2
+    { data: { id: 'general', label: 'General Info', type: 'category', parent_id: 'root' }},
+    { data: { id: 'mileage', label: 'Mileage', type: 'datapoint', parent_id: 'general' }},
+    
+    // Kanten
+    { data: { id: 'e1', source: 'root', target: 'engine' }},
+    { data: { id: 'e2', source: 'engine', target: 'fuel_level' }},
+    { data: { id: 'e3', source: 'engine', target: 'engine_status' }},
+    { data: { id: 'e4', source: 'root', target: 'general' }},
+    { data: { id: 'e5', source: 'general', target: 'mileage' }},
+  ],
+  layout: { name: 'preset' }, // Basis-Preset, wir steuern die Positionen per Code
+  userZoomingEnabled: false,
+  userPanningEnabled: false,
+});
 
-const nodes = Array.from({length: 40}, () => ({
-  x: 0, y: 0,
-  vx: (Math.random() - 0.5) * 0.4,
-  vy: (Math.random() - 0.5) * 0.4,
-  r: Math.random() * 6 + 5
-}));
+// Start-Zustand: Root in die Mitte setzen, alles andere verstecken
+const rootNode = cy.getElementById('root');
+rootNode.position({ x: cyContainer.clientWidth * 0.65, y: cyContainer.clientHeight / 2 });
 
-window.addEventListener('load', resize);
-window.addEventListener('resize', resize);
+const w = cyContainer.clientWidth;
+const h = cyContainer.clientHeight;
+const cx = w * 0.60;
+const cy2 = h * 0.55;
 
-function draw() {
- const W = canvas.parentElement.offsetWidth;
-const H = canvas.parentElement.offsetHeight;
-ctx.clearRect(0, 0, W, H);
-  
-  // Kanten
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const dx = nodes[i].x - nodes[j].x;
-      const dy = nodes[i].y - nodes[j].y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 200) {
-        ctx.beginPath();
-        ctx.moveTo(nodes[i].x, nodes[i].y);
-        ctx.lineTo(nodes[j].x, nodes[j].y);
-       ctx.strokeStyle = `rgba(29,161,242,${0.4 * (1 - dist/160)})`;
-ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-    }
+rootNode.position({ x: cx, y: cy2 });
+cy.getElementById('engine').position({ x: cx + 150, y: cy2 - 130 });
+cy.getElementById('general').position({ x: cx + 150, y: cy2 + 130 });
+cy.getElementById('fuel_level').position({ x: cx + 310, y: cy2 - 190 });
+cy.getElementById('engine_status').position({ x: cx + 310, y: cy2 - 70 });
+cy.getElementById('mileage').position({ x: cx + 310, y: cy2 + 130 });
+
+cy.nodes('[type = "datapoint"]').addClass('hidden');
+cy.edges('[target = "fuel_level"], [target = "engine_status"], [target = "mileage"]').addClass('hidden');
+
+cy.on('mouseover', 'node', function(e) {
+  e.target.addClass('hovered');
+  cyContainer.style.cursor = 'pointer';
+});
+cy.on('mouseout', 'node', function(e) {
+  e.target.removeClass('hovered');
+  cyContainer.style.cursor = 'default';
+});
+
+// Puls-Animation für klickbare Nodes
+cy.nodes('[type = "category"]').forEach(node => {
+  function pulse() {
+ node.animate({ style: { 'border-width': 5, 'border-color': 'rgba(29,161,242,0.7)' }}, { duration: 650 })
+    .animate({ style: { 'border-width': 0, 'border-color': 'rgba(29,161,242,0)' }}, { duration: 650, complete: pulse });
   }
-  
-  // Knoten
-  nodes.forEach(n => {
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-ctx.fillStyle = 'rgba(29,161,242,1)';
-    ctx.fill();
-  });
-  
-  // Bewegung
-  nodes.forEach(n => {
-    n.x += n.vx;
-    n.y += n.vy;
-   if (n.x < n.r || n.x > W - n.r) n.vx *= -1;
-if (n.y < n.r || n.y > H - n.r) n.vy *= -1;
-  });
-  
-  requestAnimationFrame(draw);
+  pulse();
+});
+
+cy.on('tap', 'node', function(e) {
+  const node = e.target;
+  const id = node.id();
+  const children = cy.nodes(`[parent_id = "${id}"]`);
+  const childEdges = cy.edges(`[source = "${id}"]`);
+
+if (children.length === 0) return;
+if (node.data('type') === 'root') return;
+if (node.data('type') === 'datapoint') return;
+
+  if (children.hasClass('hidden')) {
+    // ---- KINDER ÖFFNEN ----
+    const parentPos = node.position();
+    const radius = id === 'root' ? 180 : 130; // Abstand der neuen Knoten zum Vater
+    
+    children.removeClass('hidden');
+    childEdges.removeClass('hidden');
+
+    // Mathematische Fächer-Berechnung
+    children.forEach((child, index) => {
+      // Berechnung eines Winkels für jedes Kind, damit sie sich nicht überlagern
+      // Bei 2 Kindern z.B. links versetzt und rechts versetzt
+      let angle;
+     if (id !== 'root') {
+  const spread = Math.PI * 0.4;
+  angle = (index - (children.length - 1) / 2) * spread;
 }
-draw();
+const targetX = parentPos.x + Math.cos(angle) * radius;
+const targetY = parentPos.y + Math.sin(angle) * radius;
+
+      // Erst beim Vater positionieren (ohne Animation)
+      child.position({ x: parentPos.x, y: parentPos.y });
+
+      // Dann flüssig zur Zielposition fliegen lassen
+      child.animate({
+        position: { x: targetX, y: targetY },
+        duration: 200,
+        easing: 'ease-out-quad'
+      });
+    });
+
+  } else {
+    // ---- KINDER SCHLIESSEN ----
+    const parentPos = node.position();
+
+    // Rekursiv alle Unter-Unterknoten sofort unsichtbar machen
+    children.forEach(child => {
+      const grandChildren = cy.nodes(`[parent_id = "${child.id()}"]`);
+      const grandEdges = cy.edges(`[source = "${child.id()}"]`);
+      grandChildren.addClass('hidden');
+      grandEdges.addClass('hidden');
+    });
+
+    childEdges.addClass('hidden');
+
+    // Kinder fliegen zurück zum Vater und werden dann unsichtbar
+    let completedAnimations = 0;
+    children.animate({
+      position: { x: parentPos.x, y: parentPos.y },
+      duration: 150,
+      easing: 'ease-in-quad',
+      complete: function() {
+        completedAnimations++;
+        if (completedAnimations === children.length) {
+          children.addClass('hidden');
+        }
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>
